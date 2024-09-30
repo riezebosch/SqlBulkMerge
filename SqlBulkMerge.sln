@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlBulkMerge", "SqlBulkMerge\SqlBulkMerge.csproj", "{E865B690-B836-4257-861B-BEB9D36C1D65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlBulkMerge.Tests", "SqlBulkMerge.Tests\SqlBulkMerge.Tests.csproj", "{0F8D745D-6425-47A5-AE07-D541A92EC7B1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E865B690-B836-4257-861B-BEB9D36C1D65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E865B690-B836-4257-861B-BEB9D36C1D65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E865B690-B836-4257-861B-BEB9D36C1D65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E865B690-B836-4257-861B-BEB9D36C1D65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F8D745D-6425-47A5-AE07-D541A92EC7B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F8D745D-6425-47A5-AE07-D541A92EC7B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F8D745D-6425-47A5-AE07-D541A92EC7B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F8D745D-6425-47A5-AE07-D541A92EC7B1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
