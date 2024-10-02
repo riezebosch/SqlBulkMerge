@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SqlBulkMerge;
@@ -19,17 +20,44 @@ internal static class DbConnectionExt
     public static async Task Merge(this DbConnection connection, string target, string source, DbTransaction? transaction)
     {
         var columns = await connection.Schema(target, transaction);
+        await connection.EnableIdentityInsert(columns, transaction);
+
         await using var command = connection.CreateCommand($"""
-                               SET IDENTITY_INSERT {target} ON
-                               MERGE {target} AS TARGET
-                               USING {source} as SOURCE
-                               ON ({columns.Keys().MatchSourceToTarget()}) 
-                               WHEN MATCHED THEN UPDATE SET {columns.Values().FromSourceToTarget()}
-                               WHEN NOT MATCHED THEN INSERT ({columns.Names()}) VALUES ({columns.FromSource()});
-                               SET IDENTITY_INSERT {target} OFF
-                               """, transaction);
+                                                            MERGE {target} AS TARGET
+                                                            USING {source} as SOURCE
+                                                            ON ({columns.Keys().MatchSourceToTarget()}) 
+                                                            WHEN MATCHED THEN UPDATE SET {columns.Values().FromSourceToTarget()}
+                                                            WHEN NOT MATCHED THEN INSERT ({columns.Names()}) VALUES ({columns.FromSource()});
+                                                            """, transaction);
 
         await command.ExecuteNonQueryAsync();
+        await connection.DisableIdentityInsert(columns, transaction);
+    }
+
+    private static async Task EnableIdentityInsert(this DbConnection connection, ICollection<DbColumn> columns, DbTransaction? transaction)
+    {
+        var tables = columns
+            .Where(c => c.IsIdentity == true)
+            .Select(c => c.BaseTableName)
+            .ToList();
+        if (tables.Any())
+        {
+            await using var command = connection.CreateCommand($"SET IDENTITY_INSERT {tables.First()} ON", transaction);
+            await command.ExecuteNonQueryAsync();
+        }
+    }
+    
+    private static async Task DisableIdentityInsert(this DbConnection connection,  ICollection<DbColumn> columns, DbTransaction? transaction)
+    {
+        var tables = columns
+            .Where(c => c.IsIdentity == true)
+            .Select(c => c.BaseTableName)
+            .ToList();
+        if (tables.Any())
+        {
+            await using var command = connection.CreateCommand($"SET IDENTITY_INSERT {tables.First()} OFF", transaction);
+            await command.ExecuteNonQueryAsync();
+        }
     }
 
     private static async Task<ICollection<DbColumn>> Schema(this DbConnection connection, string table, DbTransaction? transaction)

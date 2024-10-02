@@ -18,13 +18,13 @@
         <Authors>Manuel Riezebosch</Authors>
         <NeutralLanguage>en-US</NeutralLanguage>
         <Description>Execute SqlBulkCopy into a temp table and merge the results into target table.</Description>
-        <PackageReleaseNotes>first release</PackageReleaseNotes>
+        <PackageReleaseNotes>only enable identity insert when applicable.</PackageReleaseNotes>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>sqlbulkcopy;upsert;merge</PackageTags>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/riezebosch/SqlBulkMerge.git</RepositoryUrl>
-        <Version>0.0.2</Version>
+        <Version>0.0.3</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 </Project>
