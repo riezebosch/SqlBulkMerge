@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlBulkMerge", "SqlBulkMerg
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlBulkMerge.Tests", "SqlBulkMerge.Tests\SqlBulkMerge.Tests.csproj", "{0F8D745D-6425-47A5-AE07-D541A92EC7B1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sql2yaml", "sql2yaml\sql2yaml.csproj", "{84E8399F-20CC-4F79-9607-829156BAF48C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{0F8D745D-6425-47A5-AE07-D541A92EC7B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F8D745D-6425-47A5-AE07-D541A92EC7B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F8D745D-6425-47A5-AE07-D541A92EC7B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84E8399F-20CC-4F79-9607-829156BAF48C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84E8399F-20CC-4F79-9607-829156BAF48C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84E8399F-20CC-4F79-9607-829156BAF48C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84E8399F-20CC-4F79-9607-829156BAF48C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
