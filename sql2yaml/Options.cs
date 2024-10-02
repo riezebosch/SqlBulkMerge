@@ -10,8 +10,8 @@ public class Options
     [Verb("import")]
     public class ImportOptions : Options
     {
-        [Option('f', "file", HelpText = "List of files to import.")]
-        public IEnumerable<string> Files { get; set; } = [];
+        [Option('d', "directory", HelpText = "Directory with yaml files.")]
+        public string Directory { get; set; } = string.Empty;
     }
     
     

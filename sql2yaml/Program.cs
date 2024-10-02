@@ -31,13 +31,13 @@ await parsed.WithParsedAsync<Options.ImportOptions>(async options =>
 
     var bulk = new SqlBulkMerge.SqlBulk(connection, transaction);
     var serializer = YamlDotNetDataReader.Factory.Deserializer().Build();
-
-    foreach (var file in options.Files)
+    
+    foreach (var file in new DirectoryInfo(options.Directory).EnumerateFiles("*.yaml"))
     {
-        await using var stream = File.OpenRead(file);
+        await using var stream = file.OpenRead();
         using var reader = new StreamReader(stream, leaveOpen: true);
 
         var data = serializer.Deserialize<IDataReader>(reader);
-        await bulk.Upsert(Path.GetFileNameWithoutExtension(file), c => c.WriteToServerAsync(data));
+        await bulk.Upsert(Path.GetFileNameWithoutExtension(file.Name), c => c.WriteToServerAsync(data));
     }
 });
