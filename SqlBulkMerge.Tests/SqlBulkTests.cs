@@ -15,21 +15,21 @@ public class SqlBulkTests : IAsyncLifetime
     public async Task Update()
     {
         // Arrange
-        const int id = 5;
         var table = await CreateTable(_container);
-        await _container.ExecScriptAsync($"INSERT INTO {table} VALUES ({id}, 'aaa')");
+        var insert = await _container.ExecScriptAsync($"INSERT INTO {table} VALUES ('aaa')");
+        insert.ExitCode.Should().Be(0);
 
         await using var connection = new SqlConnection(_container.GetConnectionString());
         await connection.OpenAsync();
 
         // Act
-        using var data = TestData(id, "xxx");
+        using var data = TestData(1, "xxx");
         await new SqlBulk(connection).Upsert(table, c => c.WriteToServerAsync(data));
 
         // Assert
         await using var reader = await Read(connection, table);
         reader.Read().Should().BeTrue();
-        reader["Id"].Should().Be(id);
+        reader["Id"].Should().Be(1);
         reader["Data"].Should().Be("xxx");
     }
 
@@ -37,21 +37,23 @@ public class SqlBulkTests : IAsyncLifetime
     public async Task Insert()
     {
         // Arrange
-        const int id = 2;
         var table = await CreateTable(_container);
-        
+        var insert = await _container.ExecScriptAsync($"INSERT INTO {table} VALUES ('aaa')");
+        insert.ExitCode.Should().Be(0);
+
         await using var connection = new SqlConnection(_container.GetConnectionString());
         await connection.OpenAsync();
         
         // Act
-        using var data = TestData(id, "yyy");
+        using var data = TestData(5, "zzz");
         await new SqlBulk(connection).Upsert(table, c => c.WriteToServerAsync(data));
     
         // Assert
         await using var reader = await Read(connection, table);
         reader.Read().Should().BeTrue();
-        reader["Id"].Should().Be(id);
-        reader["Data"].Should().Be("yyy");
+        reader.Read().Should().BeTrue();
+        reader["Id"].Should().Be(5);
+        reader["Data"].Should().Be("zzz");
     }
     
     [Fact]
