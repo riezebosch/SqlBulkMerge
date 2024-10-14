@@ -24,7 +24,7 @@ public class SqlBulkTests : IAsyncLifetime
 
         // Act
         using var data = TestData(1, "xxx");
-        await new SqlBulk(connection).Upsert(table, c => c.WriteToServerAsync(data));
+        await new SqlBulk(connection).Upsert(table, false, c => c.WriteToServerAsync(data));
 
         // Assert
         await using var reader = await Read(connection, table);
@@ -46,7 +46,7 @@ public class SqlBulkTests : IAsyncLifetime
         
         // Act
         using var data = TestData(5, "zzz");
-        await new SqlBulk(connection).Upsert(table, c => c.WriteToServerAsync(data));
+        await new SqlBulk(connection).Upsert(table, false, c => c.WriteToServerAsync(data));
     
         // Assert
         await using var reader = await Read(connection, table);
@@ -54,6 +54,26 @@ public class SqlBulkTests : IAsyncLifetime
         reader.Read().Should().BeTrue();
         reader["Id"].Should().Be(5);
         reader["Data"].Should().Be("zzz");
+    }
+    
+    [Fact]
+    public async Task Delete()
+    {
+        // Arrange
+        var table = await CreateTable(_container);
+        var insert = await _container.ExecScriptAsync($"INSERT INTO {table} VALUES ('aaa')");
+        insert.ExitCode.Should().Be(0);
+
+        await using var connection = new SqlConnection(_container.GetConnectionString());
+        await connection.OpenAsync();
+
+        // Act
+        using var data = new DataTable();
+        await new SqlBulk(connection).Upsert(table, true, c => c.WriteToServerAsync(data));
+
+        // Assert
+        await using var reader = await Read(connection, table);
+        reader.Read().Should().BeFalse();
     }
     
     [Fact]
@@ -68,7 +88,7 @@ public class SqlBulkTests : IAsyncLifetime
         
         // Act
         using var data = TestData(id, "yyy");
-        await new SqlBulk(connection).Upsert($"{table}", c => c.WriteToServerAsync(data));
+        await new SqlBulk(connection).Upsert($"{table}", false, c => c.WriteToServerAsync(data));
     
         // Assert
         await using var reader = await Read(connection, table);

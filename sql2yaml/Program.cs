@@ -61,7 +61,7 @@ await parsed.WithParsedAsync<Options.ImportOptions>(async options =>
         using var reader = new StreamReader(stream, leaveOpen: true);
 
         var data = serializer.Deserialize<IDataReader>(reader);
-        await bulk.Upsert(table, async c =>
+        await bulk.Upsert(table, options.DeleteUnmatched, async c =>
         {
             for (var i = 0; i < data.FieldCount; i++) 
             {
