@@ -17,18 +17,21 @@ internal static class DbConnectionExt
         return temp;
     }
 
-    public static async Task Merge(this DbConnection connection, string target, string source, DbTransaction? transaction)
+    public static async Task Merge(this DbConnection connection, string target, string source, bool delete,
+        DbTransaction? transaction)
     {
         var columns = await connection.Schema(target, transaction);
         await connection.EnableIdentityInsert(columns, transaction);
 
-        await using var command = connection.CreateCommand($"""
-                                                            MERGE {target} AS TARGET
-                                                            USING {source} as SOURCE
-                                                            ON ({columns.Keys().MatchSourceToTarget()}) 
-                                                            WHEN MATCHED THEN UPDATE SET {columns.Values().FromSourceToTarget()}
-                                                            WHEN NOT MATCHED THEN INSERT ({columns.Names()}) VALUES ({columns.FromSource()});
-                                                            """, transaction);
+        var text = $"""
+                    MERGE {target} AS TARGET
+                    USING {source} as SOURCE
+                    ON ({columns.Keys().MatchSourceToTarget()}) 
+                    WHEN MATCHED THEN UPDATE SET {columns.Values().FromSourceToTarget()}
+                    WHEN NOT MATCHED THEN INSERT ({columns.Names()}) VALUES ({columns.FromSource()})
+                    """;
+        text += delete ? "WHEN NOT MATCHED BY SOURCE THEN DELETE;" : ";";
+        await using var command = connection.CreateCommand(text, transaction);
 
         await command.ExecuteNonQueryAsync();
         await connection.DisableIdentityInsert(columns, transaction);

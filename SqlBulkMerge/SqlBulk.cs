@@ -6,7 +6,7 @@ namespace SqlBulkMerge;
 
 public class SqlBulk(SqlConnection connection, SqlTransaction? transaction = null)
 {
-    public  async Task Upsert(string table, Func<SqlBulkCopy, Task> action)
+    public  async Task Upsert(string table, bool delete, Func<SqlBulkCopy, Task> action)
     {
         var temp = await connection.TemporaryTableFrom(table, transaction);
         
@@ -14,6 +14,6 @@ public class SqlBulk(SqlConnection connection, SqlTransaction? transaction = nul
         copy.DestinationTableName = temp;
         await action(copy);
 
-        await connection.Merge(table, temp, transaction);
+        await connection.Merge(table, temp, delete, transaction);
     }
 }

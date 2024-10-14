@@ -12,6 +12,9 @@ public class Options
     {
         [Option('d', "directory", HelpText = "Directory with yaml files.")]
         public string Directory { get; set; } = string.Empty;
+
+        [Option('u', "delete-unmatched", Default = false, HelpText = "Delete records when not matched from yaml.")]
+        public bool DeleteUnmatched { get; set; }
     }
     
     
