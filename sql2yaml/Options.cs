@@ -22,7 +22,7 @@ public class Options
     public class ExportOptions : Options
     {
         [Option('t', "table", HelpText = "List of tables to include in the export.")]
-        public IEnumerable<string> Tables { get; set; } = [];
+        public IEnumerable<string> Tables { get; private set; } = [];
 
         [Option('d', "directory", HelpText = "Directory to output the yaml files.")]
         public string Directory { get; set; } = string.Empty;
