@@ -91,6 +91,7 @@ internal static class DbConnectionExt
         var command = connection.CreateCommand();
         command.CommandText = text;
         command.Transaction = transaction;
+        command.CommandTimeout = 300;
         return command;
     }
 }
