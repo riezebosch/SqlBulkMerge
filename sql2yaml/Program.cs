@@ -1,8 +1,11 @@
 ﻿using System.Data;
+using System.Globalization;
 using CommandLine;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using sql2yaml;
+
+CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
 var logger = LoggerFactory
     .Create(static builder => builder
