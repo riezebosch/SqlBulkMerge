@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -8,10 +9,10 @@ namespace SqlBulkMerge;
 
 internal static class DbConnectionExt
 {
-    public static async Task<string> TemporaryTableFrom(this DbConnection connection, string table,
+    public static async Task<string>  TemporaryTableFrom(this DbConnection connection, string table,
         DbTransaction? transaction)
     {
-        var temp = $"#{table}";
+        var temp = $"[#{table}_{DateTime.Now:s}]";
         await using var command = connection
             .CreateCommand($"SELECT TOP 0 * INTO {temp} FROM {table}", transaction);
         await command.ExecuteNonQueryAsync();
