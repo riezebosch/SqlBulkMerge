@@ -13,6 +13,7 @@
       <PackageReference Include="CommandLineParser" Version="2.9.1" />
       <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
       <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+      <PackageReference Include="NaturalSort.Extension" Version="4.3.0" />
       <PackageReference Include="YamlDotNetDataReader" Version="0.0.5" />
     </ItemGroup>
 
@@ -34,7 +35,7 @@
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/riezebosch/SqlBulkMerge.git</RepositoryUrl>
-        <Version>0.1.13</Version>
+        <Version>0.2.9</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 </Project>
