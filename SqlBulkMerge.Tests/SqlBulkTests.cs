@@ -16,8 +16,8 @@ public class SqlBulkTests : IAsyncLifetime
     {
         // Arrange
         var table = await CreateTable(_container);
-        var insert = await _container.ExecScriptAsync($"INSERT INTO {table} VALUES ('aaa')");
-        insert.ExitCode.Should().Be(0);
+        await _container.ExecScriptAsync($"INSERT INTO {table} VALUES ('aaa')")
+            .ThrowOnError();
 
         await using var connection = new SqlConnection(_container.GetConnectionString());
         await connection.OpenAsync();
@@ -38,8 +38,7 @@ public class SqlBulkTests : IAsyncLifetime
     {
         // Arrange
         var table = await CreateTable(_container);
-        var insert = await _container.ExecScriptAsync($"INSERT INTO {table} VALUES ('aaa')");
-        insert.ExitCode.Should().Be(0);
+        await _container.ExecScriptAsync($"INSERT INTO {table} VALUES ('aaa')").ThrowOnError();
 
         await using var connection = new SqlConnection(_container.GetConnectionString());
         await connection.OpenAsync();
@@ -61,8 +60,7 @@ public class SqlBulkTests : IAsyncLifetime
     {
         // Arrange
         var table = await CreateTable(_container);
-        var insert = await _container.ExecScriptAsync($"INSERT INTO {table} VALUES ('aaa')");
-        insert.ExitCode.Should().Be(0);
+        await _container.ExecScriptAsync($"INSERT INTO {table} VALUES ('aaa')").ThrowOnError();
 
         await using var connection = new SqlConnection(_container.GetConnectionString());
         await connection.OpenAsync();
@@ -105,7 +103,7 @@ public class SqlBulkTests : IAsyncLifetime
                                             Id int NOT NULL PRIMARY KEY IDENTITY(1, 1),
                                             Data varchar(255)
                                           );
-                                          """);
+                                          """).ThrowOnError();
 
         return table;
     }
@@ -118,7 +116,7 @@ public class SqlBulkTests : IAsyncLifetime
                                             Id int NOT NULL PRIMARY KEY,
                                             Data varchar(255)
                                           );
-                                          """);
+                                          """).ThrowOnError();
 
         return table;
     }
