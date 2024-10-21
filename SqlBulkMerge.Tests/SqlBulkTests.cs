@@ -94,6 +94,29 @@ public class SqlBulkTests : IAsyncLifetime
         reader["Id"].Should().Be(id);
         reader["Data"].Should().Be("yyy");
     }
+    
+    [Fact]
+    public async Task ColumnNames()
+    {
+        // Arrange
+        var table = await CreateTableColumnName(_container);
+
+        await using var connection = new SqlConnection(_container.GetConnectionString());
+        await connection.OpenAsync();
+
+        // Act
+        using var data = new DataTable();
+        data.Columns.AddRange([
+            new DataColumn("Id"),
+            new DataColumn("Order")
+        ]);
+        data.Rows.Add(2, "abcd");
+        await new SqlBulk(connection).Upsert(table, false, c => c.WriteToServerAsync(data));
+
+        // Assert
+        await using var reader = await Read(connection, table);
+        reader.Read().Should().BeTrue();
+    }
 
     private static async Task<string> CreateTable(MsSqlContainer connection)
     {
@@ -121,6 +144,18 @@ public class SqlBulkTests : IAsyncLifetime
         return table;
     }
 
+    private static async Task<string> CreateTableColumnName(MsSqlContainer connection)
+    {
+        const string table = "demo";
+        await connection.ExecScriptAsync($"""
+                                          CREATE TABLE {table} (
+                                            Id int NOT NULL PRIMARY KEY IDENTITY(1, 1),
+                                            [Order] varchar(255)
+                                          );
+                                          """).ThrowOnError();
+
+        return table;
+    }
     private static DataTable TestData(int id, string data)
     {
         var table = new DataTable();
