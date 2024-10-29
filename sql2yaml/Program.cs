@@ -45,6 +45,7 @@ static async Task Import(Options.ImportOptions options, ILogger<Program> logger)
     await using var transaction = connection.BeginTransaction();
     await using var command = connection.CreateCommand();
     command.Transaction = transaction;
+    command.CommandTimeout = 120_000;
 
     logger.LogInformation("Disable Foreign Keys"); // https://stackoverflow.com/a/161410/129269
     command.CommandText = "EXEC sp_MSforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT all'";

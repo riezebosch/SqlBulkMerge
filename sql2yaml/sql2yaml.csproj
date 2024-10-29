@@ -29,13 +29,13 @@
         <Authors>Manuel Riezebosch</Authors>
         <NeutralLanguage>en-US</NeutralLanguage>
         <Description>Import &amp; export sql to yaml</Description>
-        <PackageReleaseNotes>delete in target table unmatched records from sourceß</PackageReleaseNotes>
+        <PackageReleaseNotes>increase timeout for sql command</PackageReleaseNotes>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>sqlbulkcopy;upsert;merge;yaml</PackageTags>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/riezebosch/SqlBulkMerge.git</RepositoryUrl>
-        <Version>0.2.9</Version>
+        <Version>0.2.10</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 </Project>
