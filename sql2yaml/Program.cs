@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using CommandLine;
+using DustInTheWind.ConsoleTools.Controls.Spinners;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using sql2yaml;
@@ -19,16 +20,19 @@ await parsed.WithParsedAsync<Options.ExportOptions>(async options =>
     foreach (var table in options.Tables)
     {
         logger.LogInformation("Export {table}", table);
+        await Spinner.Run(async () =>
+        {
+            await using var command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = $"SELECT * FROM {table}";
+
+            await using var stream = File.Create(Path.Join(options.Directory, $"{table}.yaml"));
+            await using var writer = new StreamWriter(stream, leaveOpen: true);
+
+            await using var reader = await command.ExecuteReaderAsync();
+            serializer.Serialize(writer, reader);
+        });
         
-        await using var command = connection.CreateCommand();
-        command.Transaction = transaction;
-        command.CommandText = $"SELECT * FROM {table}";
-
-        await using var stream = File.Create(Path.Join(options.Directory, $"{table}.yaml"));
-        await using var writer = new StreamWriter(stream, leaveOpen: true);
-
-        await using var reader = await command.ExecuteReaderAsync();
-        serializer.Serialize(writer, reader);
     }
 });
 
@@ -56,21 +60,25 @@ await parsed.WithParsedAsync<Options.ImportOptions>(async options =>
     {
         var table = Path.GetFileNameWithoutExtension(file.Name);
         logger.LogInformation("Import  {table}", table);
-        
-        await using var stream = file.OpenRead();
-        using var reader = new StreamReader(stream, leaveOpen: true);
 
-        var data = serializer.Deserialize<IDataReader>(reader);
-        await bulk.Upsert(table, options.DeleteUnmatched, async c =>
+        await Spinner.Run(async () =>
         {
-            for (var i = 0; i < data.FieldCount; i++) 
-            {
-                var name = data.GetName(i);
-                c.ColumnMappings.Add(name, name);
-            }
+            await using var stream = file.OpenRead();
+            using var reader = new StreamReader(stream, leaveOpen: true);
 
-            await c.WriteToServerAsync(data);
+            var data = serializer.Deserialize<IDataReader>(reader);
+            await bulk.Upsert(table, options.DeleteUnmatched, async c =>
+            {
+                for (var i = 0; i < data.FieldCount; i++)
+                {
+                    var name = data.GetName(i);
+                    c.ColumnMappings.Add(name, name);
+                }
+
+                await c.WriteToServerAsync(data);
+            });
         });
+        
     }
     
     logger.LogInformation("Enable Triggers");
