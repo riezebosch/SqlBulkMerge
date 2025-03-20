@@ -5,6 +5,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using NaturalSort.Extension;
 using sql2yaml;
+using SqlBulkMerge;
 
 CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
@@ -58,8 +59,9 @@ static async Task Import(Options.ImportOptions options, ILogger<Program> logger)
     await ExecuteScripts(connection, transaction, options.PreImportScripts, logger);
 
     var bulk = new SqlBulkMerge.SqlBulk(connection, transaction);
-    var serializer = YamlDotNetDataReader.Factory.Deserializer();
-
+    var serializer = YamlDotNetDataReader.Factory.Builder.Deserializer()
+        .Build();
+    
     foreach (var file in new DirectoryInfo(options.Directory).EnumerateFiles("*.yaml"))
     {
         var table = Path.GetFileNameWithoutExtension(file.Name);
@@ -109,16 +111,13 @@ static async Task Export(Options.ExportOptions options, ILogger<Program> logger)
     
     await using var transaction = connection.BeginTransaction();
     await ExecuteScripts(connection, transaction, options.PreExportScripts, logger);
-    
-    var serializer = YamlDotNetDataReader.Factory.Serializer();
+
+    var serializer = YamlDotNetDataReader.Factory.Builder.Serializer().WithQuotingNecessaryStrings().Build();
     foreach (var table in options.Tables)
     {
         logger.LogInformation("Export {table}", table);
 
-        await using var command = connection.CreateCommand();
-        command.Transaction = transaction;
-        command.CommandText = $"SELECT * FROM {table}";
-
+        await using var command = await connection.SelectFromTable(table, transaction);
         await using var stream = File.Create(Path.Join(options.Directory, $"{table}.yaml"));
         await using var writer = new StreamWriter(stream, leaveOpen: true);
 
@@ -141,7 +140,8 @@ static async Task ExecuteScript(SqlConnection connection, SqlTransaction transac
     await command.ExecuteNonQueryAsync();
 }
 
-static async Task ExecuteScripts(SqlConnection connection, SqlTransaction transaction, IEnumerable<string> scripts, ILogger<Program> logger)
+static async Task ExecuteScripts(SqlConnection connection, SqlTransaction transaction, IEnumerable<string> scripts,
+    ILogger<Program> logger)
 {
     foreach (var script in scripts)
     {
@@ -151,7 +151,8 @@ static async Task ExecuteScripts(SqlConnection connection, SqlTransaction transa
         }
         else if (Directory.Exists(script))
         {
-            foreach (var data in Directory.EnumerateFiles(script, "*.sql").Order(StringComparer.OrdinalIgnoreCase.WithNaturalSort()))
+            foreach (var data in Directory.EnumerateFiles(script, "*.sql")
+                         .Order(StringComparer.OrdinalIgnoreCase.WithNaturalSort()))
             {
                 await ExecuteScript(connection, transaction, data, logger);
             }

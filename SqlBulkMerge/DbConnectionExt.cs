@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SqlBulkMerge;
 
-internal static class DbConnectionExt
+public static class DbConnectionExt
 {
     public static async Task<string>  TemporaryTableFrom(this DbConnection connection, string table,
         DbTransaction? transaction)
@@ -93,6 +93,22 @@ internal static class DbConnectionExt
         command.CommandText = text;
         command.Transaction = transaction;
         command.CommandTimeout = 300;
+        return command;
+    }
+    
+    public static async Task<DbCommand> SelectFromTable(this DbConnection connection, string table, DbTransaction? transaction)
+    {
+        var command =  connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = $"SELECT * FROM {table}";
+        
+        var schema = await command.Connection.Schema(table, command.Transaction);
+        var keys = schema.Keys().ToList();
+        if (keys.Count != 0)
+        {
+            command.CommandText += $" ORDER BY {keys.Names()}";
+        }
+
         return command;
     }
 }
